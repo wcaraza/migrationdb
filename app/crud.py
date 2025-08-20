@@ -1,11 +1,17 @@
 from __future__ import annotations
 from typing import Iterable, List, Literal, get_args
 from sqlalchemy.orm import Session
+from dotenv import load_dotenv
 
 from . import models
 
+
+load_dotenv()
+
+
+#MAX_BATCH_SIZE = os.getenv("MAX_BATCH_SIZE")
 MAX_BATCH_SIZE = 1000
-BulkTable = Literal["departments", "jobs"]#employees
+BulkTable = Literal["departments", "jobs", "employees"]
 
 
 def bulk_insert(
@@ -19,12 +25,14 @@ def bulk_insert(
 
     model_map = {
         "departments": models.Department,
-        "jobs": models.Job
+        "jobs": models.Job,
+        "employees": models.Employee
     }
     
     for tname in tables_list:
         
         model = model_map[tname]
+
         if table == tname:
             k=0
 
@@ -34,7 +42,8 @@ def bulk_insert(
 
                 objs = [model(**row) for row in chunk]
                 db.add_all(objs)
-                print(f"batch in table {table} - {k}")
+
+                print(f"processing table {table} - batch process: {k}")
                 total_inserted += len(objs)
 
             return total_inserted

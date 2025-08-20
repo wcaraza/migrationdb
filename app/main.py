@@ -2,7 +2,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
+from fastapi import FastAPI, UploadFile, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
@@ -14,8 +14,7 @@ from .etl import collect_dir_csvs, ingest_files_in_order
 
 
 
-
-app = FastAPI(title="DB Migration REST API", version="1.1.0")
+app = FastAPI(title="DB Migration REST API", version="1.2.0")
 
 
 
@@ -37,4 +36,4 @@ def ingest_from_dir(
         raise HTTPException(status_code=400, detail=f"No CSV files found in {dir_path} matching departments/jobs/employees.")
     print(files)
     results = ingest_files_in_order(db, files)
-    return True
+    return results

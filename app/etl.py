@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Iterable, List, Dict, Tuple
+from typing import List, Dict, Tuple
 from sqlalchemy.orm import Session
 
 import csv
@@ -8,12 +8,11 @@ from .crud import bulk_insert
 
 
 
-
-ORDERED_TABLES = ["departments", "jobs", "hired_employees"]
-TABLE_SCHEMAS = {
+ORDERED_TABLES = ["departments", "jobs", "employees"]
+CSV_SCHEMAS = {
     "departments": ["department_id", "name"],
     "jobs": ["job_id", "job_name"],
-    "hired_employees": ["id", "name", "datetime", "department_id", "job_id"],
+    "hired_employees": ["employee_id", "name", "hire_date", "department_id", "job_id"]
 }
 
 def infer_table_from_filename(
@@ -37,7 +36,7 @@ def collect_dir_csvs(
 def read_csv_rows(
         path: Path) -> List[Dict]:
     with path.open("r", encoding="utf-8") as f:
-        reader = csv.DictReader(f,fieldnames=TABLE_SCHEMAS[path.stem])
+        reader = csv.DictReader(f,fieldnames=CSV_SCHEMAS[path.stem])
         rows = list(reader)
     
     normalized = [{k: (v if v != "" else None) for k, v in row.items()} for row in rows]
