@@ -10,9 +10,9 @@ from .crud import bulk_insert
 
 ORDERED_TABLES = ["departments", "jobs", "employees"]
 CSV_SCHEMAS = {
-    "departments": ["department_id", "name"],
-    "jobs": ["job_id", "job_name"],
-    "hired_employees": ["employee_id", "name", "hire_date", "department_id", "job_id"]
+    "departments": ["id", "department"],
+    "jobs": ["id", "job"],
+    "hired_employees": ["id", "name", "datetime", "department_id", "job_id"]
 }
 
 def infer_table_from_filename(
