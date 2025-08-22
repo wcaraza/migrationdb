@@ -1,13 +1,10 @@
 from __future__ import annotations
-import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
-from dotenv import load_dotenv
 
-load_dotenv()
-
+from .config import *
 from .database import SessionLocal
 from .etl import collect_dir_csvs, ingest_files_in_order
 from .crud import employee_quarter, hired_employees_by_department
@@ -28,8 +25,7 @@ def get_db():
 @app.post("/migration/csv-from-dir")
 def migration_from_dir(
     db: Session = Depends(get_db)):
-    dir_env = os.getenv("INGEST_DIR")
-    dir_path = Path(dir_env)
+    dir_path = Path(DIR_ENV)
     files = collect_dir_csvs(dir_path)
     if not files:
         raise HTTPException(status_code=400, detail=f"No CSV files found in {dir_path} matching departments/jobs/employees.")

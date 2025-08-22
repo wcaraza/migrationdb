@@ -2,16 +2,10 @@ from __future__ import annotations
 from typing import List, Literal, get_args
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from dotenv import load_dotenv
 
 from . import models
+from .config import *
 
-
-load_dotenv()
-
-
-#MAX_BATCH_SIZE = os.getenv("MAX_BATCH_SIZE")
-MAX_BATCH_SIZE = 1000
 BulkTable = Literal["departments", "jobs", "employees"]
 
 

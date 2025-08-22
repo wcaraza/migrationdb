@@ -1,10 +1,13 @@
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 from sqlalchemy.orm import Session
 
 import csv
+import boto3
+import io
 
 from .crud import bulk_insert
+from .config import *
 
 
 
@@ -33,12 +36,26 @@ def collect_dir_csvs(
             out.append((p.name, p))
     return out
 
-def read_csv_rows(
-        path: Path) -> List[Dict]:
-    with path.open("r", encoding="utf-8") as f:
-        reader = csv.DictReader(f,fieldnames=CSV_SCHEMAS[path.stem])
-        rows = list(reader)
-    
+
+def read_csv_rows_from_s3(bucket: str, key: str):
+    """
+    Read csv file from bucket S3 and return list of dicts.
+    """
+    s3 = boto3.client(
+        "s3",
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        region_name=REGION_NAME,
+    )
+
+    # Get object from S3
+    obj = s3.get_object(Bucket=bucket, Key=str(key))
+    body = obj["Body"].read().decode("utf-8")
+
+    # Parse CSV
+    reader = csv.DictReader(io.StringIO(body), fieldnames=CSV_SCHEMAS[key.stem])
+    rows = list(reader)
+
     normalized = [{k: (v if v != "" else None) for k, v in row.items()} for row in rows]
     return normalized
 
@@ -56,7 +73,9 @@ def ingest_files_in_order(
     results = {}
     for table in ORDERED_TABLES:
         for original_name, path in buckets[table]:
-            rows = read_csv_rows(path)
+
+            rows = read_csv_rows_from_s3(bucket="wcaraza", key=path)
+
             if not rows:
                 results[original_name] = {"inserted": 0, "skipped": 0, "message": "empty file"}
                 continue
