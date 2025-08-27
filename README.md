@@ -15,7 +15,7 @@ Project to migrate local csv data to database on AWS RDS
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # on Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 

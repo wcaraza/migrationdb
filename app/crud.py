@@ -8,6 +8,13 @@ from .config import *
 
 BulkTable = Literal["departments", "jobs", "employees"]
 
+def reset_db(db: Session):
+    db.query(models.Employee).delete()
+    db.query(models.Job).delete()
+    db.query(models.Department).delete()
+    db.commit()
+    db.close()
+
 
 def bulk_insert(
         db: Session, 
@@ -21,7 +28,7 @@ def bulk_insert(
     model_map = {
         "departments": models.Department,
         "jobs": models.Job,
-        "employees": models.Employee
+        "employees": models.Employee,
     }
     
     for tname in tables_list:

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from .config import *
 from .database import SessionLocal
 from .etl import collect_dir_csvs, ingest_files_in_order
-from .crud import employee_quarter, hired_employees_by_department
+from .crud import employee_quarter, hired_employees_by_department, reset_db
 
 
 app = FastAPI(title="DB Migration REST API", version="1.3.0")
@@ -21,7 +21,6 @@ def get_db():
     finally:
         db.close()
 
-
 @app.post("/migration/csv-from-dir")
 def migration_from_dir(
     db: Session = Depends(get_db)):
@@ -30,6 +29,7 @@ def migration_from_dir(
     if not files:
         raise HTTPException(status_code=400, detail=f"No CSV files found in {dir_path} matching departments/jobs/employees.")
     print(files)
+    reset_db(db)
     results = ingest_files_in_order(db, files)
     return results
 
